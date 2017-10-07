@@ -17,7 +17,10 @@ API_KEY = ''
 
 def getGoogleMapsDirections(origin, destination, mode, api_key):
     URL = 'https://maps.googleapis.com/maps/api/directions/json?origin='+origin+'&destination='+destination+'&mode='+mode+'&key='+api_key
-    request = urllib.request.urlopen(URL)
+    try:
+        request = urllib.request.urlopen(URL)
+    except:
+        return(-1)
     googleResponse = request.read()
     googleResponse = googleResponse.decode('utf8')
     result = json.loads(googleResponse)
@@ -25,6 +28,8 @@ def getGoogleMapsDirections(origin, destination, mode, api_key):
     
 def getGoogleMapsDirectionsSeconds(origin, destination, mode, api_key):
     results = getGoogleMapsDirections(origin, destination, mode, api_key)
+    if(results == -1):
+        return(-2) #Error detected with the HTTP request or the Google API
     duration_seconds = -1 #default value
     for route in results['routes']:
         for leg in route['legs']:
@@ -35,7 +40,7 @@ def showHelp():
     print('Example usage: python ' + sys.argv[0] + ' origin destination mode')
     print(' - Addresses cannot have spaces')
     print(' - Available modes: driving, walking, transit, bycicling\n')
-    print(' - The program will return -1 if no result was found with the given addresses.')
+    print(' - The program will return -1 if no result was found with the given addresses and -2 if the address triggered an error in the request.')
     print('')
     print(' Example: python ' + sys.argv[0] + ' old+port+montreal mont+royal+montreal walking\n')
 
